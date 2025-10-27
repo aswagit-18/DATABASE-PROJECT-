@@ -54,8 +54,6 @@
 
   <div class="container">
     <h3 class="text-center my-3">Complaint Management Dashboard</h3>
-
-    <!-- Complaint Table -->
     <div class="table-responsive">
       <table class="table table-bordered table-striped" id="complaintsTable">
         <thead>
@@ -77,11 +75,8 @@
       </table>
     </div>
   </div>
-
   <script>
     const API_URL = "http://localhost:5050/api/complaints";
-
-    // Load all complaints from backend
     async function loadComplaints() {
       try {
         const res = await fetch(API_URL);
@@ -92,12 +87,9 @@
         console.error(err);
       }
     }
-
-    // Display complaints in the table
     function displayComplaints(data) {
       const tbody = document.getElementById("complaintBody");
       tbody.innerHTML = "";
-
       if (!data.length) {
         tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted">No complaints found</td></tr>`;
         return;
@@ -130,19 +122,15 @@
         tbody.insertAdjacentHTML("beforeend", row);
       });
     }
-
-    // Update complaint status/assigned staff
     async function updateComplaint(id) {
       const status = document.getElementById(`status-${id}`).value;
       const assigned_to = document.getElementById(`assign-${id}`).value;
-
       try {
         const response = await fetch(`${API_URL}/update/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status, assigned_to }),
         });
-
         const result = await response.json();
         if (response.ok) {
           alert("Complaint updated successfully!");
@@ -155,8 +143,6 @@
         console.error(err);
       }
     }
-
-    // Load complaints on page load
     document.addEventListener("DOMContentLoaded", loadComplaints);
   </script>
 </body>
