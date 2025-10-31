@@ -1,7 +1,6 @@
 import express from "express";
 import pool from "../db.js";
 import PDFDocument from "pdfkit";
-import ExcelJS from "exceljs";
 const router = express.Router();
 async function getFilteredComplaints({ from, to, type, reg_no }) {
   let query = "SELECT * FROM complaints WHERE 1=1";
@@ -26,70 +25,58 @@ router.get("/pdf", async (req, res) => {
   try {
     const { from, to, type, reg_no } = req.query;
     const complaints = await getFilteredComplaints({ from, to, type, reg_no });
-    const doc = new PDFDocument({ margin: 30, size: "A4" });
+    const doc = new PDFDocument({ margin: 40, size: "A4" });
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=complaints_report.pdf");
-    doc.fontSize(18).text("Student Hostel Complaint Report", { align: "center" });
+    doc.pipe(res);
+    doc.fontSize(18).font("Helvetica-Bold").text("Student Hostel Complaint Report", { align: "center" });
     doc.moveDown();
-    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleString()}`);
+    doc.fontSize(12).font("Helvetica");
+    doc.text(`Generated on: ${new Date().toLocaleString()}`);
     if (from && to) doc.text(`Date Range: ${from} → ${to}`);
     if (type) doc.text(`Work Type: ${type}`);
     if (reg_no) doc.text(`Student Reg No: ${reg_no}`);
-    doc.moveDown();
-    doc.font("Helvetica-Bold");
-    doc.text("ID", 50);
-    doc.text("Reg No", 100);
-    doc.text("Type", 200);
-    doc.text("Status", 300);
-    doc.text("Created", 400);
-    doc.moveDown(0.5);
-    doc.font("Helvetica").moveDown();
-    complaints.forEach((c) => {
-      doc.text(c.id, 50);
-      doc.text(c.reg_no, 100);
-      doc.text(c.work_type, 200);
-      doc.text(c.status, 300);
-      doc.text(new Date(c.created_at).toLocaleDateString(), 400);
-      doc.moveDown(0.5);
+    doc.moveDown(1);
+    const tableTop = doc.y;
+    const colWidths = [40, 90, 120, 100, 100];
+    doc.rect(40, tableTop, 510, 25).fill("#0047b3");
+    doc.fillColor("white").font("Helvetica-Bold").fontSize(12);
+    const headers = ["ID", "Reg No", "Work Type", "Status", "Created"];
+    let x = 45;
+    headers.forEach((h, i) => {
+      doc.text(h, x, tableTop + 7);
+      x += colWidths[i];
+    });
+    doc.fillColor("black").font("Helvetica");
+    let y = tableTop + 25;
+    complaints.forEach((c, idx) => {
+      if (y > 760) {
+        doc.addPage();
+        y = 50;
+      }
+      if (idx % 2 === 0) {
+        doc.rect(40, y, 510, 22).fill("#f2f2f2");
+        doc.fillColor("black");
+      }
+      const row = [
+        c.id,
+        c.reg_no,
+        c.work_type,
+        c.status,
+        new Date(c.created_at).toLocaleDateString(),
+      ];
+      x = 45;
+      row.forEach((text, i) => {
+        doc.text(text, x, y + 5);
+        x += colWidths[i];
+      });
+      doc.rect(40, y, 510, 22).stroke();
+      y += 22;
     });
     doc.end();
-    doc.pipe(res);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to generate PDF" });
-  }
-});
-router.get("/excel", async (req, res) => {
-  try {
-    const { from, to, type, reg_no } = req.query;
-    const complaints = await getFilteredComplaints({ from, to, type, reg_no });
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet("Complaints Report");
-    sheet.columns = [
-      { header: "ID", key: "id", width: 6 },
-      { header: "Reg No", key: "reg_no", width: 15 },
-      { header: "Name", key: "student_name", width: 25 },
-      { header: "Room", key: "room_no", width: 15 },
-      { header: "Work Type", key: "work_type", width: 15 },
-      { header: "Category", key: "category", width: 15 },
-      { header: "Status", key: "status", width: 12 },
-      { header: "Assigned To", key: "assigned_to", width: 20 },
-      { header: "Created At", key: "created_at", width: 20 }
-    ];
-    complaints.forEach((c) => sheet.addRow(c));
-    res.setHeader(
-      "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=complaints_report.xlsx"
-    );
-    await workbook.xlsx.write(res);
-    res.status(200).end();
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to generate Excel" });
   }
 });
 export default router;

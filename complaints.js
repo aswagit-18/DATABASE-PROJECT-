@@ -41,4 +41,13 @@ router.put("/update/:id", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
+router.delete("/delete/all", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM complaints");
+    res.status(200).json({ message: "All complaints deleted successfully" });
+  } catch (err) {
+    console.error("Database error:", err);
+    res.status(500).json({ error: "Failed to delete complaints" });
+  }
+});
 export default router;
