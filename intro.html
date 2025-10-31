@@ -31,9 +31,9 @@
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
-            transition: 0.3s;
             display: inline-block;
             margin: 5px;
+            transition: 0.3s;
         }
         .btn-custom:hover {
             background-color: #0056b3;
@@ -47,21 +47,17 @@
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="intro-container">
-        <img src="image2.jpg" alt="Welcome Icon" class="header-img">
+        <img src="image2.jpg" class="header-img">
         <h1>Welcome to the Student Maintenance Requisition System</h1>
         <p>
-            This system allows students to submit maintenance requests for their rooms and facilities.
-            You can provide details about the issue, submit feedback, and track your requests efficiently.
+            This system allows students to submit hostel complaints and maintenance requests
+            and track status in real-time.
         </p>
-        <img src="image3.jpg" alt="Info Icon" class="header-img">
-
-        <!-- Buttons for both Student and Admin -->
+        <img src="image3.jpg" class="header-img">
         <a href="login.html" class="btn btn-custom">Student Login</a>
-        <a href="admin_login.html" class="btn btn-custom">Admin Portal</a>
-
+        <a href="intro.html?admin=true" class="btn btn-custom">Admin Portal</a>
         <div class="creators">
             <p>Created by:</p>
             <p><strong>23BCE2233 - ASWANTH</strong></p>
@@ -69,6 +65,13 @@
         </div>
     </div>
 </div>
-
+<script>
+if (window.location.search.includes("admin=true")) {
+    window.location.href = "admin_login.html";
+}
+if (location.protocol === "file:") {
+    console.warn("Open using Live Server / localhost for navigation to work.");
+}
+</script>
 </body>
 </html>

@@ -4,10 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Login - Hostel Complaint System</title>
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
   <style>
     body {
       background: linear-gradient(to right, #007bff, #00c6ff);
@@ -43,6 +40,7 @@
   </style>
 </head>
 <body>
+
   <div class="login-box">
     <h3>Admin Login</h3>
     <form id="adminLoginForm">
@@ -56,35 +54,29 @@
     </form>
   </div>
 
-  <script>
-    // ✅ Predefined admin credentials
-    const ADMIN_CREDENTIALS = [
-      { username: "admin", password: "12345" },
-      { username: "warden", password: "warden123" },
-      { username: "maintenance", password: "fixit456" }
-    ];
-
-    function loginAdmin() {
-      const username = document.getElementById("adminUser").value.trim();
-      const password = document.getElementById("adminPass").value.trim();
-
-      const matched = ADMIN_CREDENTIALS.find(
-        (a) => a.username === username && a.password === password
-      );
-
-      if (matched) {
-        alert("Login Successful!");
-        localStorage.setItem("adminLoggedIn", matched.username);
-        window.location.href = "admin.html";
-      } else {
-        alert("Invalid username or password!");
-      }
-    }
-
-    // Auto-redirect if already logged in
-    if (localStorage.getItem("adminLoggedIn")) {
+<script>
+  const ADMIN_CREDENTIALS = [
+    { username: "admin", password: "12345" },
+    { username: "warden", password: "warden123" },
+    { username: "maintenance", password: "fixit456" }
+  ];
+  function loginAdmin() {
+    const username = document.getElementById("adminUser").value.trim();
+    const password = document.getElementById("adminPass").value.trim();
+    const matched = ADMIN_CREDENTIALS.find(
+      (a) => a.username === username && a.password === password
+    );
+    if (matched) {
+      alert("Login Successful!");
+      localStorage.setItem("adminLoggedIn", matched.username);
       window.location.href = "admin.html";
+    } else {
+      alert("Invalid username or password!");
     }
-  </script>
+  }
+  if (localStorage.getItem("adminLoggedIn")) {
+    window.location.href = "admin.html";
+  }
+</script>
 </body>
 </html>
